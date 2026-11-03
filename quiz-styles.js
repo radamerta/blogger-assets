@@ -1,5 +1,11 @@
+/**
+ * Blogger CBT Pro Engine
+ * Author: AI Assistant Collaboration
+ * Assets: quiz-styles.js
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
-  // 1. FUNGSI UNTUK MENGACAK OPSI JAWABAN (Fisher-Yates Shuffle)
+  // 1. ALGORITMA SHUFFLING (Mengacak Pilihan Ganda tiap Refresh)
   function shuffleOptions() {
     const optionGroups = document.querySelectorAll(".cbt-options-group");
     optionGroups.forEach((group) => {
@@ -12,10 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Jalankan pengacakan pilihan jawaban sejak awal
+  // Jalankan pengacakan pilihan jawaban saat dokumen dimuat
   shuffleOptions();
 
-  // 2. FUNGSI HITUNG PAPAN SKOR KUMULATIF
+  // 2. SISTEM KALKULASI SKORING CBT REAL-TIME
   const quizItems = document.querySelectorAll(".cbt-quiz-item");
   
   function updateScoreboard() {
@@ -35,10 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    // Kalkulasi skor (skala 0 - 100)
     let skorAkhir = totalSoal > 0 ? Math.round((benar / totalSoal) * 100) : 0;
 
-    // Render ke HTML widget papan skor jika elemennya ada
+    // Sinkronisasi data ke DOM Elemen Scoreboard HTML
     if(document.getElementById("cbt-total-soal")) document.getElementById("cbt-total-soal").textContent = totalSoal;
     if(document.getElementById("cbt-terjawab")) document.getElementById("cbt-terjawab").textContent = terjawab;
     if(document.getElementById("cbt-benar")) document.getElementById("cbt-benar").textContent = benar;
@@ -46,10 +51,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if(document.getElementById("cbt-skor-akhir")) document.getElementById("cbt-skor-akhir").textContent = skorAkhir;
   }
 
-  // Set inisialisasi awal papan skor
+  // Inisialisasi awal papan skor (0)
   updateScoreboard();
 
-  // 3. MANAJEMEN LOGIKA TOMBOL INTERAKTIF TIAP SOAL
+  // 3. LOGIKA INTERAKSI FUNGSIONAL TOMBOL
   quizItems.forEach((item) => {
     const submitBtn = item.querySelector(".btn-cbt-submit");
     const resetBtn = item.querySelector(".btn-cbt-reset");
@@ -57,75 +62,79 @@ document.addEventListener("DOMContentLoaded", function () {
     const accordionBox = item.querySelector(".accordion");
     const correctAnswer = item.getAttribute("data-answer");
 
-    // LOGIKA TOMBOL KIRIM
-    submitBtn.addEventListener("click", function () {
-      // Jika kuis untuk soal ini sudah dikunci/dikirim sebelumnya, abaikan klik berulang
-      if (item.classList.contains("is-submitted")) return;
+    // AKSI TOMBOL KIRIM JAWABAN
+    if (submitBtn) {
+      submitBtn.addEventListener("click", function () {
+        if (item.classList.contains("is-submitted")) return; // Kunci tombol jika sudah terkirim
 
-      const selectedOption = item.querySelector('input[type="radio"]:checked');
+        const selectedOption = item.querySelector('input[type="radio"]:checked');
 
-      if (!selectedOption) {
-        alert("Silakan pilih salah satu jawaban terlebih dahulu!");
-        return;
-      }
-
-      // Tambahkan penanda bahwa soal telah dikirim dan bersihkan status lama
-      item.classList.add("is-submitted");
-      item.classList.remove("is-correct", "is-wrong");
-      feedbackStatus.classList.remove("benar", "salah");
-
-      // Kunci semua radio button pada soal ini biar tidak bisa diganti-ganti
-      const radios = item.querySelectorAll('input[type="radio"]');
-      radios.forEach(radio => radio.disabled = true);
-
-      // Cek Validasi Jawaban
-      if (selectedOption.value === correctAnswer) {
-        feedbackStatus.textContent = "✓ JAWABAN BENAR";
-        feedbackStatus.classList.add("benar");
-        item.classList.add("is-correct"); // Triggers CSS background hijau
-      } else {
-        feedbackStatus.textContent = "✗ JAWABAN SALAH";
-        feedbackStatus.classList.add("salah");
-        item.classList.add("is-wrong"); // Triggers CSS background merah
-      }
-
-      // Tampilkan Pembahasan
-      if (accordionBox) {
-        accordionBox.classList.remove("d-none");
-      }
-
-      // Perbarui total nilai di widget papan skor
-      updateScoreboard();
-    });
-
-    // LOGIKA TOMBOL HAPUS / RESET
-    resetBtn.addEventListener("click", function () {
-      // Hilangkan status penguncian kelas CSS
-      item.classList.remove("is-submitted", "is-correct", "is-wrong");
-
-      // Buka kembali kunci radio button dan kosongkan pilihan
-      const radios = item.querySelectorAll('input[type="radio"]');
-      radios.forEach((radio) => {
-        radio.checked = false;
-        radio.disabled = false;
-      });
-
-      // Sembunyikan status feedback teks
-      feedbackStatus.textContent = "";
-      feedbackStatus.classList.remove("benar", "salah");
-      
-      // Sembunyikan dan lipat kembali akordeon pembahasan
-      if (accordionBox) {
-        accordionBox.classList.add("d-none");
-        const collapseElement = accordionBox.querySelector(".accordion-collapse");
-        if (collapseElement && collapseElement.classList.contains("show")) {
-          const triggerBtn = accordionBox.querySelector(".cbt-btn-trigger");
-          if (triggerBtn) triggerBtn.click();
+        if (!selectedOption) {
+          alert("Silakan pilih salah satu jawaban terlebih dahulu!");
+          return;
         }
-      }
 
-      // Perbarui ulang nilai di widget papan skor setelah dihapus
-      updateScoreboard();
-    });
+        // Setup status submit komponen kuis
+        item.classList.add("is-submitted");
+        feedbackStatus.classList.remove("benar", "salah");
+
+        // Kunci input agar tidak bisa diretas/diganti jawabannya setelah klik kirim
+        const radios = item.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => radio.disabled = true);
+
+        // Validasi Kunci Jawaban
+        if (selectedOption.value === correctAnswer) {
+          feedbackStatus.textContent = "✓ JAWABAN BENAR";
+          feedbackStatus.classList.add("benar");
+          item.classList.add("is-correct"); // Triggers CSS Highlight Hijau
+        } else {
+          feedbackStatus.textContent = "✗ JAWABAN SALAH";
+          feedbackStatus.classList.add("salah");
+          item.classList.add("is-wrong"); // Triggers CSS Highlight Merah
+        }
+
+        // Tampilkan Box Pembahasan Accordion Bootstrap
+        if (accordionBox) {
+          accordionBox.classList.remove("d-none");
+        }
+
+        // Segarkan Papan Skor
+        updateScoreboard();
+      });
+    }
+
+    // AKSI TOMBOL HAPUS JAWABAN / RESET
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        // Lepas status penguncian class CSS kuis
+        item.classList.remove("is-submitted", "is-correct", "is-wrong");
+
+        // Aktifkan kembali radio button dan kosongkan centangnya
+        const radios = item.querySelectorAll('input[type="radio"]');
+        radios.forEach((radio) => {
+          radio.checked = false;
+          radio.disabled = false;
+        });
+
+        // Kosongkan status teks umpan balik
+        if (feedbackStatus) {
+          feedbackStatus.textContent = "";
+          feedbackStatus.classList.remove("benar", "salah");
+        }
+        
+        // Sembunyikan dan gulung kembali Box Pembahasan
+        if (accordionBox) {
+          accordionBox.classList.add("d-none");
+          const collapseElement = accordionBox.querySelector(".accordion-collapse");
+          if (collapseElement && collapseElement.classList.contains("show")) {
+            const triggerBtn = accordionBox.querySelector(".cbt-btn-trigger");
+            if (triggerBtn) triggerBtn.click();
+          }
+        }
+
+        // Segarkan Papan Skor kembali
+        updateScoreboard();
+      });
+    }
   });
 });
