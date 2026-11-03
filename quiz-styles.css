@@ -7,6 +7,7 @@
   --cbt-primary: #1f287d;       /* Warna Utama Tema Eduzaid */
   --cbt-secondary: #e7b10a;     /* Warna Aksen Emas/Kuning */
   --cbt-success: #13847b;       /* Warna Jawaban Benar */
+  --cbt-danger: #d9534f;        /* Warna Jawaban Salah / Peringatan */
   --cbt-dark: #2c3e50;          /* Warna Teks Utama */
   --cbt-muted: #6c757d;         /* Warna Teks Redup */
   --cbt-bg-light: #f8f9fa;      /* Latar Ringan */
@@ -213,4 +214,148 @@
   margin-top: 10px;
   margin-bottom: 0;
   text-align: justify;
+}
+
+/* ==========================================================================
+   TAMBAHAN BARU: LOGIKA INTERAKTIF CBT (KIRIM, HAPUS, & STATUS FEEDBACK)
+   ========================================================================== */
+
+/* --- 10. GRUP TOMBOL AKSI --- */
+.cbt-action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.btn-cbt {
+  font-family: var(--cbt-font-header);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--cbt-transition);
+  border: none;
+}
+
+/* Tombol Kirim */
+.btn-cbt-submit {
+  background-color: var(--cbt-primary);
+  color: #ffffff;
+}
+
+.btn-cbt-submit:hover {
+  opacity: 0.9;
+}
+
+/* Tombol Hapus */
+.btn-cbt-reset {
+  background-color: #e0e0e0;
+  color: #333333;
+}
+
+.btn-cbt-reset:hover {
+  background-color: #d5d5d5;
+}
+
+/* --- 11. STATUS FEEDBACK JAWABAN --- */
+.cbt-feedback-status {
+  font-family: var(--cbt-font-header);
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 12px;
+  display: none; /* Tersembunyi sebelum tombol Kirim ditekan */
+}
+
+.cbt-feedback-status.benar {
+  display: block;
+  color: var(--cbt-success);
+}
+
+.cbt-feedback-status.salah {
+  display: block;
+  color: var(--cbt-danger);
+}
+
+/* --- 12. UTILITY CLASS (Untuk manipulasi JavaScript / Bootstrap Fallback) --- */
+.d-none {
+  display: none !important;
+}
+
+/* --- HIGHLIGHT JAWABAN INTERAKTIF --- */
+/* Status jika jawaban yang dipilih BENAR */
+.cbt-quiz-item.is-correct .cbt-options-group input[type="radio"]:checked + span,
+.cbt-quiz-item.is-correct .cbt-options-group input[type="radio"]:checked ~ span {
+  color: var(--cbt-success) !important;
+}
+.cbt-quiz-item.is-correct .cbt-options-group input[type="radio"]:checked,
+.cbt-quiz-item.is-correct .cbt-options-group input[type="radio"]:checked + label,
+.cbt-quiz-item.is-correct .cbt-options-group input[type="radio"]:checked ~ label,
+.cbt-quiz-item.is-correct .japilum:has(input:checked),
+.cbt-quiz-item.is-correct .japilku:has(input:checked) {
+  background-color: rgba(19, 132, 123, 0.1) !important;
+  border-color: var(--cbt-success) !important;
+}
+
+/* Status jika jawaban yang dipilih SALAH */
+.cbt-quiz-item.is-wrong .cbt-options-group input[type="radio"]:checked + span,
+.cbt-quiz-item.is-wrong .cbt-options-group input[type="radio"]:checked ~ span {
+  color: var(--cbt-danger) !important;
+}
+.cbt-quiz-item.is-wrong .cbt-options-group input[type="radio"]:checked,
+.cbt-quiz-item.is-wrong .cbt-options-group input[type="radio"]:checked + label,
+.cbt-quiz-item.is-wrong .cbt-options-group input[type="radio"]:checked ~ label,
+.cbt-quiz-item.is-wrong .japilum:has(input:checked),
+.cbt-quiz-item.is-wrong .japilku:has(input:checked) {
+  background-color: rgba(217, 83, 79, 0.1) !important;
+  border-color: var(--cbt-danger) !important;
+}
+
+/* Mengubah kursor menjadi 'tidak diizinkan' saat input dikunci */
+.cbt-options-group input:disabled, 
+.cbt-options-group input:disabled + span,
+.cbt-quiz-item.is-submitted .japilum,
+.cbt-quiz-item.is-submitted .japilku {
+  cursor: not-allowed !important;
+}
+
+/* --- WIDGET PAPAN SKOR REALTIME --- */
+.cbt-scoreboard {
+  background: #ffffff;
+  border: 2px solid var(--cbt-primary);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  font-family: var(--cbt-font-header);
+}
+.cbt-score-title {
+  color: var(--cbt-primary);
+  font-weight: 800;
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--cbt-bg-light);
+  padding-bottom: 8px;
+}
+.cbt-score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 15px;
+  text-align: center;
+}
+.cbt-score-box {
+  background: var(--cbt-bg-light);
+  padding: 10px;
+  border-radius: 8px;
+}
+.cbt-score-num {
+  font-size: 22px;
+  font-weight: 800;
+  display: block;
+}
+.cbt-score-label {
+  font-size: 12px;
+  color: var(--cbt-muted);
+  font-weight: 600;
 }
